@@ -27,7 +27,7 @@ export function isValidRating(rating: number): boolean {
 export function areSentenceRatingsComplete(
   sentenceId: string,
   models: string[],
-  ratings: Array<{ sentenceId: string; model: string; naturalness: number; accuracy: number }>
+  ratings: Array<{ sentenceId: string; model: string; naturalness?: number; accuracy?: number }>
 ): boolean {
   const sentenceRatings = ratings.filter(r => r.sentenceId === sentenceId);
   

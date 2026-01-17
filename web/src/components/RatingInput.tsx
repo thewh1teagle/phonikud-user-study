@@ -44,7 +44,7 @@ export function RatingInput({
           >
             {ratingOptions.map((rating) => (
               <div key={`nat-${rating}`} className="flex flex-col items-center gap-1">
-                <RadioGroupItem value={rating.toString()} id={`${uniqueId}-nat-${rating}`} name={`${uniqueId}-naturalness`} />
+                <RadioGroupItem value={rating.toString()} id={`${uniqueId}-nat-${rating}`} />
                 <Label htmlFor={`${uniqueId}-nat-${rating}`} className="cursor-pointer text-sm">
                   {rating}
                 </Label>
@@ -69,7 +69,7 @@ export function RatingInput({
           >
             {ratingOptions.map((rating) => (
               <div key={`acc-${rating}`} className="flex flex-col items-center gap-1">
-                <RadioGroupItem value={rating.toString()} id={`${uniqueId}-acc-${rating}`} name={`${uniqueId}-accuracy`} />
+                <RadioGroupItem value={rating.toString()} id={`${uniqueId}-acc-${rating}`} />
                 <Label htmlFor={`${uniqueId}-acc-${rating}`} className="cursor-pointer text-sm">
                   {rating}
                 </Label>
