@@ -24,6 +24,9 @@ service cloud.firestore {
     match /submissions/{document=**} {
       allow read, write: if true;
     }
+    match /comments/{document=**} {
+      allow read, write: if true;
+    }
   }
 }
 ```

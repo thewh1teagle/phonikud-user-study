@@ -10,6 +10,7 @@ import Welcome from './routes/Welcome';
 import Evaluation from './routes/Evaluation';
 import ThankYou from './routes/ThankYou';
 import Results from './routes/Results';
+import Feedbacks from './routes/Feedbacks';
 import TestFirebase from './routes/experimental/TestFirebase.tsx'
 
 // Set document direction to RTL for Hebrew
@@ -32,6 +33,7 @@ createRoot(document.getElementById('root')!).render(
           />
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/results" element={<Results />} />
+          <Route path="/feedbacks" element={<Feedbacks />} />
           <Route path="/experimental/test-firebase" element={<TestFirebase />} />
         </Routes>
       </BrowserRouter>

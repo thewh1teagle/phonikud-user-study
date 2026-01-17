@@ -4,13 +4,14 @@ export interface UserData {
   isNativeSpeaker: boolean;
   sessionId: string;
   sentenceOrder: string[]; // Shuffled sentence IDs
+  comments?: string; // Optional feedback from user
 }
 
 export interface Rating {
   sentenceId: string;
   model: string; // e.g., "phonikud", "nakdimon", "google", "azure"
-  naturalness: number; // 1-5
-  accuracy: number; // 1-5
+  naturalness?: number; // 1-5
+  accuracy?: number; // 1-5
 }
 
 export interface ModelShuffle {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import type { ModelStats } from '../lib/firebase';
@@ -126,13 +127,23 @@ export default function Results() {
             </div>
 
             {/* Actions */}
-            <div className="flex justify-between items-center pt-4">
-              <Button onClick={loadResults} variant="outline">
-                🔄 רענן
-              </Button>
-              <Button onClick={handleDownloadCSV}>
-                ⬇ הורד CSV
-              </Button>
+            <div className="flex flex-wrap justify-between items-center gap-2 pt-4">
+              <div className="flex gap-2">
+                <Button asChild variant="outline">
+                  <Link to="/">דף הבית</Link>
+                </Button>
+                <Button onClick={loadResults} variant="outline">
+                  🔄 רענן
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button asChild variant="secondary">
+                  <Link to="/feedbacks">הערות משתתפים</Link>
+                </Button>
+                <Button onClick={handleDownloadCSV}>
+                  ⬇ הורד CSV
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

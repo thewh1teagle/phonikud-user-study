@@ -31,11 +31,12 @@ export function useSingleAudioPlayer() {
 
   // Cleanup on unmount
   useEffect(() => {
+    const registeredAudio = audioRefs.current;
     return () => {
-      audioRefs.current.forEach((audio) => {
+      registeredAudio.forEach((audio) => {
         audio.pause();
       });
-      audioRefs.current.clear();
+      registeredAudio.clear();
     };
   }, []);
 

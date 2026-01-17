@@ -10,7 +10,6 @@ import { submitBatch } from '../lib/firebase';
 import type { Sentence } from '../types/survey';
 import { Progress } from '../components/ui/progress';
 import { Button } from '../components/ui/button';
-import { SentenceCard } from '../components/SentenceCard';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { RatingInput } from '../components/RatingInput';
 
@@ -24,7 +23,6 @@ export default function Evaluation() {
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [playedAudio, setPlayedAudio] = useState<Set<string>>(new Set());
 
   // Load sentences on mount
   useEffect(() => {
@@ -65,11 +63,6 @@ export default function Evaluation() {
     [...TTS_MODELS]
   );
 
-  // Reset played audio when sentence changes
-  useEffect(() => {
-    setPlayedAudio(new Set());
-  }, [currentSentenceId]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -88,11 +81,14 @@ export default function Evaluation() {
     m => m.sentenceId === currentSentenceId
   );
 
-  // Check if all audio for current sentence has been played
-  const allAudioPlayed = currentModelShuffle 
-    ? currentModelShuffle.modelOrder.every(model => 
-        playedAudio.has(`${currentSentenceId}-${model}`)
-      )
+  // Check if all ratings are complete
+  const allRatingsComplete = currentModelShuffle
+    ? currentModelShuffle.modelOrder.every(model => {
+        const rating = surveyState.ratings.find(
+          r => r.sentenceId === currentSentenceId && r.model === model
+        );
+        return rating && rating.naturalness && rating.accuracy;
+      })
     : false;
 
   if (!currentSentenceData || !currentModelShuffle) {
@@ -104,7 +100,7 @@ export default function Evaluation() {
   }
 
   const handleNext = async () => {
-    if (!allAudioPlayed || !currentSentenceId) return;
+    if (!allRatingsComplete || !currentSentenceId) return;
 
     // Check if this sentence hasn't been submitted yet
     if (!surveyState.submittedSentences.includes(currentSentenceId)) {
@@ -117,13 +113,17 @@ export default function Evaluation() {
             r => r.sentenceId === currentSentenceId && r.model === model
           );
           
+          if (!rating || !rating.naturalness || !rating.accuracy) {
+            throw new Error('חסרות דירוגים עבור אחת הדגימות');
+          }
+          
           return {
             name: userData.name,
             email: userData.email,
             sentence_id: currentSentenceId,
             model,
-            naturalness: rating?.naturalness || 3,
-            accuracy: rating?.accuracy || 3
+            naturalness: rating.naturalness,
+            accuracy: rating.accuracy
           };
         });
 
@@ -164,28 +164,10 @@ export default function Evaluation() {
     updateRating(currentSentenceId, model, { [field]: value });
   };
 
-  const handleAudioPlayed = (model: string) => {
-    setPlayedAudio(prev => new Set(prev).add(`${currentSentenceId}-${model}`));
-    
-    // Ensure rating exists with default values when audio is played
-    const existingRating = surveyState.ratings.find(
-      r => r.sentenceId === currentSentenceId && r.model === model
-    );
-    
-    if (!existingRating) {
-      updateRating(currentSentenceId, model, { 
-        naturalness: 3, 
-        accuracy: 3 
-      });
-    }
-  };
-
   const getModelRating = (model: string) => {
-    const rating = surveyState.ratings.find(
+    return surveyState.ratings.find(
       r => r.sentenceId === currentSentenceId && r.model === model
     );
-    // Return rating if exists, otherwise return default values
-    return rating || { sentenceId: currentSentenceId, model, naturalness: 3, accuracy: 3 };
   };
 
   return (
@@ -202,12 +184,16 @@ export default function Evaluation() {
           <Progress value={progressPercentage} className="w-full" />
         </div>
 
-        {/* Sentence Display */}
-        <SentenceCard text={currentSentenceData.text} />
-
         {/* Instructions */}
-        <div className="text-center text-slate-600" dir="rtl">
-          <p>האזינו לכל דגימה ודרגו את טבעיות הדיבור ודיוק ההגייה</p>
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200" dir="rtl">
+          <div className="space-y-2 text-sm">
+            <p className="font-semibold">הנחיות לדירוג:</p>
+            <ul className="list-disc list-inside space-y-1 mr-4">
+              <li><strong>טבעיות הדיבור:</strong> עד כמה הדיבור נשמע טבעי ודומה לדובר אנושי (טון, קצב, זרימה)</li>
+              <li><strong>התאמה לטקסט:</strong> עד כמה האודיו משקף נכון את הטקסט (הגייה, ניקוד, דגשים)</li>
+            </ul>
+            <p className="text-slate-600 mt-3">האזינו לכל 4 הדגימות ודרגו כל אחת בנפרד.</p>
+          </div>
         </div>
 
         {/* Audio Players and Ratings */}
@@ -219,18 +205,30 @@ export default function Evaluation() {
 
             return (
               <div key={`${currentSentenceId}-${model}`} className="space-y-3">
-                <AudioPlayer 
-                  key={`audio-${currentSentenceId}-${model}`}
-                  audioSrc={audioSrc} 
-                  label={label}
-                  onPlayed={() => handleAudioPlayed(model)}
-                  onAudioRef={registerAudio}
-                />
+                {/* Text and Audio Player combined */}
+                <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-3">
+                  <div className="text-xs text-slate-500 mb-1 text-center" dir="rtl">
+                    הטקסט:
+                  </div>
+                  <div className="text-lg font-medium text-center mb-3" dir="rtl">
+                    {currentSentenceData.text}
+                  </div>
+                  
+                  <AudioPlayer 
+                    key={`audio-${currentSentenceId}-${model}`}
+                    audioSrc={audioSrc} 
+                    label={label}
+                    onAudioRef={registerAudio}
+                  />
+                </div>
+                
                 <RatingInput
                   key={`rating-${currentSentenceId}-${model}`}
                   label={label}
-                  naturalness={rating.naturalness}
-                  accuracy={rating.accuracy}
+                  sentenceId={currentSentenceId}
+                  model={model}
+                  naturalness={rating?.naturalness}
+                  accuracy={rating?.accuracy}
                   onNaturalnessChange={(value) => handleRatingChange(model, 'naturalness', value)}
                   onAccuracyChange={(value) => handleRatingChange(model, 'accuracy', value)}
                 />
@@ -251,16 +249,16 @@ export default function Evaluation() {
 
           <Button
             onClick={handleNext}
-            disabled={!allAudioPlayed || isSubmitting}
+            disabled={!allRatingsComplete || isSubmitting}
           >
             {isSubmitting ? 'שומר...' : isLastSentence ? 'סיים' : 'הבא →'}
           </Button>
         </div>
 
         {/* Warning if not complete */}
-        {!allAudioPlayed && (
+        {!allRatingsComplete && (
           <div className="text-center text-sm text-amber-600" dir="rtl">
-            נא להאזין לכל הדגימות לפני המעבר למשפט הבא
+            נא לדרג את כל הדגימות לפני המעבר למשפט הבא
           </div>
         )}
       </div>

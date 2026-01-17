@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Button } from './ui/button';
+import { Play, Pause } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface AudioPlayerProps {
@@ -110,7 +111,17 @@ export function AudioPlayer({ audioSrc, label, onPlayed, onAudioRef, className }
           onClick={togglePlayPause}
           className="min-w-[80px]"
         >
-          {isPlaying ? '⏸ עצור' : '▶ הפעל'}
+          {isPlaying ? (
+            <>
+              <Pause className="h-4 w-4" />
+              <span>עצור</span>
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4" />
+              <span>הפעל</span>
+            </>
+          )}
         </Button>
 
         <div className="flex-1 flex items-center gap-2">

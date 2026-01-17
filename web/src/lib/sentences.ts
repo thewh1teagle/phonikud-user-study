@@ -29,8 +29,15 @@ export async function loadSentences(): Promise<Sentence[]> {
       return { id: id.trim(), text: text.trim() };
     });
     
-    console.log(`Successfully loaded ${sentences.length} sentences`);
-    return sentences;
+    const limitRaw = import.meta.env.VITE_SENTENCE_LIMIT;
+    const limit = limitRaw ? Number(limitRaw) : undefined;
+    const limitedSentences =
+      Number.isFinite(limit) && limit && limit > 0
+        ? sentences.slice(0, limit)
+        : sentences;
+
+    console.log(`Successfully loaded ${limitedSentences.length} sentences`);
+    return limitedSentences;
   } catch (error) {
     console.error('Error loading sentences:', error);
     throw error;

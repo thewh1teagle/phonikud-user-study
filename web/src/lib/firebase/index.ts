@@ -24,6 +24,14 @@ export interface Submission {
   timestamp?: Date;
 }
 
+export interface CommentSubmission {
+  name: string;
+  email: string;
+  comments: string;
+  sessionId: string;
+  timestamp?: Date;
+}
+
 /**
  * Submit a rating to Firestore
  */
@@ -60,6 +68,35 @@ export async function submitBatch(submissions: Submission[]): Promise<void> {
     console.log(`Batch of ${submissions.length} submissions added successfully`);
   } catch (error) {
     console.error('Error submitting batch:', error);
+    throw error;
+  }
+}
+
+/**
+ * Submit user comments to Firestore
+ */
+export async function submitComments(commentData: CommentSubmission): Promise<void> {
+  try {
+    const docRef = await addDoc(collection(db, 'comments'), {
+      ...commentData,
+      timestamp: new Date()
+    });
+    console.log('Comments submitted with ID:', docRef.id);
+  } catch (error) {
+    console.error('Error submitting comments:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all comments from Firestore
+ */
+export async function getAllComments(): Promise<CommentSubmission[]> {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'comments'));
+    return querySnapshot.docs.map(doc => doc.data() as CommentSubmission);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
     throw error;
   }
 }

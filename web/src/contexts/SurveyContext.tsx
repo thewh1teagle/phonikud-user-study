@@ -53,7 +53,7 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         // Add new rating
         return {
           ...prev,
-          ratings: [...prev.ratings, { sentenceId, model, naturalness: 3, accuracy: 3, ...updates }]
+          ratings: [...prev.ratings, { sentenceId, model, ...updates }]
         };
       }
     });
