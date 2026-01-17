@@ -134,10 +134,10 @@ export default function Welcome() {
       <Card className="max-w-2xl w-full">
         <CardHeader>
           <CardTitle className="text-center text-2xl" dir="rtl">
-            ברוכים הבאים למחקר הערכת הפקת דיבור דיבור בעברית
+            ברוכים הבאים למחקר הערכת הפקת דיבור בעברית
           </CardTitle>
           <CardDescription className="text-center text-base mt-4" dir="rtl">
-            במחקר זה תתבקשו להאזין ל-20 משפטים בעברית, כאשר כל משפט יוצג ב-4 גרסאות שונות של הפקת דיבור דיבור.
+            במחקר זה תתבקשו להאזין ל-20 משפטים בעברית, כאשר כל משפט יוצג ב-4 גרסאות שונות של הפקת דיבור.
             עליכם לדרג כל גרסה לפי טבעיות הדיבור ודיוק ההגייה.
             <br /><br />
             המחקר אורך כ-15-20 דקות.
