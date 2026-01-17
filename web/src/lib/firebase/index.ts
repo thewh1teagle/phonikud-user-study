@@ -15,8 +15,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 export interface Submission {
+  name: string;
   email: string;
-  q_id: number;
+  sentence_id: string;
   model: string;
   naturalness: number;  // 1-5
   accuracy: number;     // 1-5
@@ -48,15 +49,16 @@ export async function exportToCSV(): Promise<string> {
     const querySnapshot = await getDocs(collection(db, 'submissions'));
 
     // CSV header
-    const headers = ['email', 'q_id', 'model', 'naturalness', 'accuracy', 'timestamp'];
+    const headers = ['name', 'email', 'sentence_id', 'model', 'naturalness', 'accuracy', 'timestamp'];
     const rows = [headers.join(',')];
 
     // CSV rows
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       const row = [
+        data.name,
         data.email,
-        data.q_id,
+        data.sentence_id,
         data.model,
         data.naturalness,
         data.accuracy,

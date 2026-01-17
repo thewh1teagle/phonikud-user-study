@@ -8,9 +8,10 @@ async function main() {
     // Test submission
     console.log('Testing submission...');
     await submitSubmission({
+      name: 'Test User',
       email: 'test@example.com',
-      q_id: 1,
-      model: 'gemini',
+      sentence_id: 'gold_000_line_012',
+      model: 'gemini_unvocalized',
       naturalness: 4,
       accuracy: 5
     });
