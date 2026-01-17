@@ -50,6 +50,18 @@ export default function Evaluation() {
     500
   );
 
+  // Warn before leaving if survey not complete
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (surveyState.isComplete) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [surveyState.isComplete]);
+
   const { 
     progressPercentage, 
     canGoPrevious, 
