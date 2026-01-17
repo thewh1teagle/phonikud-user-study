@@ -53,9 +53,7 @@ export default function Evaluation() {
   );
 
   const { 
-    isCurrentSentenceComplete, 
     progressPercentage, 
-    canGoNext, 
     canGoPrevious, 
     isLastSentence,
     currentSentenceId
