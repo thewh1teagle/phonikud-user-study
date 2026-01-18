@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import type { ModelStats } from '../lib/firebase';
 import { getAllSubmissions, calculateStats, exportToCSV } from '../lib/firebase';
+import { RefreshCcw, Download, Home, MessageSquare } from 'lucide-react';
 
 export default function Results() {
   const [stats, setStats] = useState<ModelStats[]>([]);
@@ -130,18 +131,26 @@ export default function Results() {
             <div className="flex flex-wrap justify-between items-center gap-2 pt-4">
               <div className="flex gap-2">
                 <Button asChild variant="outline">
-                  <Link to="/">דף הבית</Link>
+                  <Link to="/">
+                    <Home className="h-4 w-4" />
+                    דף הבית
+                  </Link>
                 </Button>
                 <Button onClick={loadResults} variant="outline">
-                  🔄 רענן
+                  <RefreshCcw className="h-4 w-4" />
+                  רענן
                 </Button>
               </div>
               <div className="flex gap-2">
                 <Button asChild variant="secondary">
-                  <Link to="/feedbacks">הערות משתתפים</Link>
+                  <Link to="/feedbacks">
+                    <MessageSquare className="h-4 w-4" />
+                    הערות משתתפים
+                  </Link>
                 </Button>
                 <Button onClick={handleDownloadCSV}>
-                  ⬇ הורד CSV
+                  <Download className="h-4 w-4" />
+                  הורד CSV
                 </Button>
               </div>
             </div>

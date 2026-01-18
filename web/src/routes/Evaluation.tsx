@@ -8,10 +8,12 @@ import { useSingleAudioPlayer } from '../hooks/useSingleAudioPlayer';
 import { loadSentences, TTS_MODELS } from '../lib/sentences';
 import { submitBatch } from '../lib/firebase';
 import type { Sentence } from '../types/survey';
+import { cn } from '../lib/utils';
 import { Progress } from '../components/ui/progress';
 import { Button } from '../components/ui/button';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { RatingInput } from '../components/RatingInput';
+import { Info, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Evaluation() {
   const navigate = useNavigate();
@@ -197,14 +199,25 @@ export default function Evaluation() {
         </div>
 
         {/* Instructions */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200" dir="rtl">
-          <div className="space-y-2 text-sm">
-            <p className="font-semibold">הנחיות לדירוג:</p>
-            <ul className="list-disc list-inside space-y-1 mr-4">
-              <li><strong>טבעיות הדיבור:</strong> עד כמה הדיבור נשמע טבעי ודומה לדובר אנושי (טון, קצב, זרימה)</li>
-              <li><strong>התאמה לטקסט:</strong> עד כמה האודיו משקף נכון את הטקסט (הגייה, ניקוד, דגשים)</li>
-            </ul>
-            <p className="text-slate-600 mt-3">האזינו לכל 4 הדגימות ודרגו כל אחת בנפרד.</p>
+        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm" dir="rtl">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 rounded-full bg-slate-100 p-2 text-slate-700">
+              <Info className="h-4 w-4" />
+            </div>
+            <div className="space-y-2 text-sm text-slate-700">
+              <div className="font-semibold">הנחיות לדירוג</div>
+              <div className="grid gap-1">
+                <div>
+                  <span className="font-semibold">טבעיות הדיבור:</span>{' '}
+                  עד כמה הדיבור נשמע טבעי ודומה לדובר אנושי (טון, קצב, זרימה)
+                </div>
+                <div>
+                  <span className="font-semibold">התאמה לטקסט:</span>{' '}
+                  עד כמה האודיו משקף נכון את הטקסט (הגייה, ניקוד, דגשים)
+                </div>
+              </div>
+              <div className="text-slate-500">האזינו לכל 4 הדגימות ודרגו כל אחת בנפרד.</div>
+            </div>
           </div>
         </div>
 
@@ -215,30 +228,49 @@ export default function Evaluation() {
             const audioSrc = `${import.meta.env.BASE_URL}audio/${model}/${currentSentenceId}.m4a`;
             const rating = getModelRating(model);
 
+            const isComplete = Boolean(rating?.naturalness && rating?.accuracy);
+            const sampleId = `${currentSentenceId}-${model}`;
+
             return (
-              <div key={`${currentSentenceId}-${model}`} className="space-y-3">
-                {/* Text and Audio Player combined */}
-                <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-3">
-                  <div className="text-xs text-slate-500 mb-1 text-center" dir="rtl">
-                    הטקסט:
+              <div
+                key={sampleId}
+                className={cn(
+                  "rounded-xl border bg-white p-5 space-y-5 transition-colors shadow-sm",
+                  isComplete ? "border-emerald-400 bg-emerald-50/40" : "border-slate-200"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-lg font-semibold" dir="rtl">
+                    דגימה {label}
                   </div>
-                  <div className="text-lg font-medium text-center mb-3" dir="rtl">
+                  {isComplete && (
+                    <div className="text-xs font-medium text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
+                      הושלם
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                  <div className="text-xs text-slate-500 text-center mb-1" dir="rtl">
+                    הטקסט שהוזן למערכת
+                  </div>
+                  <div className="text-lg font-medium text-center" dir="rtl">
                     {currentSentenceData.text}
                   </div>
-                  
-                  <AudioPlayer 
-                    key={`audio-${currentSentenceId}-${model}`}
-                    audioSrc={audioSrc} 
-                    label={label}
-                    onAudioRef={registerAudio}
-                  />
                 </div>
-                
-                <RatingInput
-                  key={`rating-${currentSentenceId}-${model}`}
+
+                <AudioPlayer 
+                  key={`audio-${sampleId}`}
+                  audioSrc={audioSrc} 
                   label={label}
-                  sentenceId={currentSentenceId}
-                  model={model}
+                  onAudioRef={registerAudio}
+                  className="bg-transparent p-0 border-0 rounded-none shadow-none"
+                  showLabel={false}
+                />
+
+                <RatingInput
+                  key={`rating-${sampleId}`}
+                  idPrefix={sampleId}
                   naturalness={rating?.naturalness}
                   accuracy={rating?.accuracy}
                   onNaturalnessChange={(value) => handleRatingChange(model, 'naturalness', value)}
@@ -256,14 +288,24 @@ export default function Evaluation() {
             onClick={handlePrevious}
             disabled={!canGoPrevious || isSubmitting}
           >
-            ← הקודם
+            <ChevronLeft className="h-4 w-4" />
+            הקודם
           </Button>
 
           <Button
             onClick={handleNext}
             disabled={!allRatingsComplete || isSubmitting}
           >
-            {isSubmitting ? 'שומר...' : isLastSentence ? 'סיים' : 'הבא →'}
+            {isSubmitting ? (
+              'שומר...'
+            ) : isLastSentence ? (
+              'סיים'
+            ) : (
+              <>
+                הבא
+                <ChevronRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
+import { CheckCircle, MessageSquare } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { useSurvey } from '../contexts/SurveyContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -59,7 +60,7 @@ export default function ThankYou() {
       <Card className="max-w-2xl w-full">
         <CardHeader>
           <CardTitle className="text-center text-3xl" dir="rtl">
-            תודה רבה על השתתפותך! 🎉
+            תודה רבה על השתתפותך!
           </CardTitle>
         </CardHeader>
         
@@ -102,14 +103,24 @@ export default function ThankYou() {
                 variant="secondary"
                 className="w-full"
               >
-                {isSubmitting ? 'שולח...' : 'שלח הערות'}
+                {isSubmitting ? (
+                  'שולח...'
+                ) : (
+                  <>
+                    <MessageSquare className="h-4 w-4" />
+                    שלח הערות
+                  </>
+                )}
               </Button>
             </div>
           )}
 
           {hasSubmittedComments && (
             <div className="text-center text-green-600 font-medium pt-6 border-t border-slate-200" dir="rtl">
-              תודה על המשוב! 💚
+              <span className="inline-flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                תודה על המשוב!
+              </span>
             </div>
           )}
         </CardContent>

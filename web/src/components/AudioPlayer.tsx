@@ -9,9 +9,17 @@ interface AudioPlayerProps {
   onPlayed?: () => void; // Callback when audio has been played
   onAudioRef?: (audio: HTMLAudioElement | null) => void; // Callback to register audio element
   className?: string;
+  showLabel?: boolean;
 }
 
-export function AudioPlayer({ audioSrc, label, onPlayed, onAudioRef, className }: AudioPlayerProps) {
+export function AudioPlayer({
+  audioSrc,
+  label,
+  onPlayed,
+  onAudioRef,
+  className,
+  showLabel = true
+}: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -100,9 +108,11 @@ export function AudioPlayer({ audioSrc, label, onPlayed, onAudioRef, className }
       <audio ref={audioRef} src={audioSrc} preload="metadata" />
       
       <div className="flex items-center gap-3">
-        <div className="text-2xl font-bold text-slate-700 min-w-[2rem] text-center">
-          {label}
-        </div>
+        {showLabel && (
+          <div className="text-2xl font-bold text-slate-700 min-w-[2rem] text-center">
+            {label}
+          </div>
+        )}
         
         <Button
           type="button"

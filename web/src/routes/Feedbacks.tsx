@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import type { CommentSubmission } from '../lib/firebase';
 import { getAllComments } from '../lib/firebase';
+import { RefreshCcw, ArrowRight } from 'lucide-react';
 
 export default function Feedbacks() {
   const [comments, setComments] = useState<CommentSubmission[]>([]);
@@ -63,10 +64,14 @@ export default function Feedbacks() {
           <CardContent className="space-y-6">
             <div className="flex justify-between items-center">
               <Button onClick={loadComments} variant="outline">
-                🔄 רענן
+                <RefreshCcw className="h-4 w-4" />
+                רענן
               </Button>
               <Button asChild variant="secondary">
-                <Link to="/results">חזרה לתוצאות</Link>
+                <Link to="/results">
+                  <ArrowRight className="h-4 w-4" />
+                  חזרה לתוצאות
+                </Link>
               </Button>
             </div>
 

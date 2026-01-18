@@ -3,9 +3,7 @@ import { Label } from './ui/label';
 import { cn } from '../lib/utils';
 
 interface RatingInputProps {
-  label: string; // e.g., "A", "B", "C", "D"
-  sentenceId: string; // Unique sentence ID
-  model: string; // Model name for uniqueness
+  idPrefix: string;
   naturalness?: number;
   accuracy?: number;
   onNaturalnessChange: (value: number) => void;
@@ -13,72 +11,74 @@ interface RatingInputProps {
   className?: string;
 }
 
+interface ScaleRowProps {
+  idPrefix: string;
+  title: string;
+  value?: number;
+  onChange: (value: number) => void;
+  leftLabel: string;
+  rightLabel: string;
+}
+
+const ratingOptions = [1, 2, 3, 4, 5];
+
+function ScaleRow({ idPrefix, title, value, onChange, leftLabel, rightLabel }: ScaleRowProps) {
+  return (
+    <div className="space-y-3">
+      <Label className="text-base font-semibold block text-center">{title}</Label>
+
+      <div className="flex items-center justify-center gap-3" dir="rtl">
+        <span className="text-xs text-slate-500 whitespace-nowrap">{leftLabel}</span>
+        <RadioGroup
+          key={`${idPrefix}-group`}
+          value={value?.toString() || undefined}
+          onValueChange={(next) => onChange(parseInt(next))}
+          className="flex justify-center gap-4"
+        >
+          {ratingOptions.map((rating) => {
+            const itemId = `${idPrefix}-${rating}`;
+            return (
+              <div key={itemId} className="flex flex-col items-center gap-1">
+                <RadioGroupItem value={rating.toString()} id={itemId} />
+                <Label htmlFor={itemId} className="cursor-pointer text-sm">
+                  {rating}
+                </Label>
+              </div>
+            );
+          })}
+        </RadioGroup>
+        <span className="text-xs text-slate-500 whitespace-nowrap">{rightLabel}</span>
+      </div>
+    </div>
+  );
+}
+
 export function RatingInput({
-  label,
-  sentenceId,
-  model,
+  idPrefix,
   naturalness,
   accuracy,
   onNaturalnessChange,
   onAccuracyChange,
   className
 }: RatingInputProps) {
-  const ratingOptions = [1, 2, 3, 4, 5];
-  const uniqueId = `${sentenceId}-${model}`;
-
   return (
-    <div className={cn("p-4 border rounded-lg bg-white space-y-6", className)}>
-      <div className="text-xl font-bold text-center mb-2">דגימה {label}</div>
-      
-      {/* Naturalness Rating */}
-      <div className="space-y-3">
-        <Label className="text-base font-semibold block text-center">טבעיות הדיבור</Label>
-        
-        <div className="flex items-center justify-center gap-3" dir="rtl">
-          <span className="text-xs text-slate-500 whitespace-nowrap">טבעי מאוד</span>
-          <RadioGroup
-            key={`${uniqueId}-naturalness-group`}
-            value={naturalness?.toString() || undefined} 
-            onValueChange={(value) => onNaturalnessChange(parseInt(value))}
-            className="flex justify-center gap-4"
-          >
-            {ratingOptions.map((rating) => (
-              <div key={`nat-${rating}`} className="flex flex-col items-center gap-1">
-                <RadioGroupItem value={rating.toString()} id={`${uniqueId}-nat-${rating}`} />
-                <Label htmlFor={`${uniqueId}-nat-${rating}`} className="cursor-pointer text-sm">
-                  {rating}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-          <span className="text-xs text-slate-500 whitespace-nowrap">לא טבעי</span>
-        </div>
-      </div>
-
-      {/* Accuracy Rating */}
-      <div className="space-y-3">
-        <Label className="text-base font-semibold block text-center">התאמה לטקסט</Label>
-        
-        <div className="flex items-center justify-center gap-3" dir="rtl">
-          <span className="text-xs text-slate-500 whitespace-nowrap">תואם מאוד</span>
-          <RadioGroup
-            key={`${uniqueId}-accuracy-group`}
-            value={accuracy?.toString() || undefined} 
-            onValueChange={(value) => onAccuracyChange(parseInt(value))}
-            className="flex justify-center gap-4"
-          >
-            {ratingOptions.map((rating) => (
-              <div key={`acc-${rating}`} className="flex flex-col items-center gap-1">
-                <RadioGroupItem value={rating.toString()} id={`${uniqueId}-acc-${rating}`} />
-                <Label htmlFor={`${uniqueId}-acc-${rating}`} className="cursor-pointer text-sm">
-                  {rating}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-          <span className="text-xs text-slate-500 whitespace-nowrap">לא תואם</span>
-        </div>
-      </div>
+    <div className={cn("space-y-6", className)}>
+      <ScaleRow
+        idPrefix={`${idPrefix}-naturalness`}
+        title="טבעיות הדיבור"
+        value={naturalness}
+        onChange={onNaturalnessChange}
+        leftLabel="טבעי מאוד"
+        rightLabel="לא טבעי"
+      />
+      <ScaleRow
+        idPrefix={`${idPrefix}-accuracy`}
+        title="התאמה לטקסט"
+        value={accuracy}
+        onChange={onAccuracyChange}
+        leftLabel="תואם מאוד"
+        rightLabel="לא תואם"
+      />
     </div>
   );
 }
