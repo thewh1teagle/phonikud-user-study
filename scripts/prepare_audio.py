@@ -1,9 +1,9 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
-#     "pandas",
-#     "sh",
-#     "tqdm",
+#     "pandas==2.3.3",
+#     "sh==2.2.2",
+#     "tqdm==4.67.1",
 # ]
 # ///
 
