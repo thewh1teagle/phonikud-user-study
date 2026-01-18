@@ -3,7 +3,7 @@
 ## Package Managers
 - JavaScript/Node.js: `pnpm` (sometimes `pnpx`)
 - Python: `uv`
-  - Add deps to scripts: `uv add --script example.py <packages>`
+  - Add deps to scripts: `uv add --script example.py <packages> --bounds exact`
   - Run scripts: `uv run example.py`
   - Create scripts: `uv init --script example.py --python 3.12`
 
