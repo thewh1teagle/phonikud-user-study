@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import type { LocalStorageData } from '../types/survey';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import type { LocalStorageData } from '@/types/survey';
 
 // Mock localStorage to ensure test isolation
 const localStorageMock = (() => {

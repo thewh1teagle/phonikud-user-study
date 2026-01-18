@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateShuffles, shuffleArray } from '../lib/shuffle';
+import { generateShuffles, shuffleArray } from '@/lib/shuffle';
 
 describe('Shuffle Logic (Research Integrity)', () => {
   const models = ['modelA', 'modelB', 'modelC', 'modelD'];

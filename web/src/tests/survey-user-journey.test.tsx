@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import Welcome from '../routes/Welcome';
-import Evaluation from '../routes/Evaluation';
-import ThankYou from '../routes/ThankYou';
-import { UserProvider } from '../contexts/UserContext';
-import { SurveyProvider } from '../contexts/SurveyContext';
-import { submitBatch } from '../lib/firebase';
-import type { Submission } from '../lib/firebase';
+import Welcome from '@/routes/Welcome';
+import Evaluation from '@/routes/Evaluation';
+import ThankYou from '@/routes/ThankYou';
+import { UserProvider } from '@/contexts/UserContext';
+import { SurveyProvider } from '@/contexts/SurveyContext';
+import { submitBatch } from '@/lib/firebase';
+import type { Submission } from '@/lib/firebase';
 
 // --- Mocks ---
 
@@ -17,13 +17,13 @@ vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(), collection: vi.fn(), addDoc: vi.fn(), getDocs: vi.fn(), doc: vi.fn(),
   writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn().mockResolvedValue(undefined) })),
 }));
-vi.mock('../lib/firebase', async () => {
-  const actual = await vi.importActual<typeof import('../lib/firebase')>('../lib/firebase');
+vi.mock('@/lib/firebase', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/firebase')>('@/lib/firebase');
   return { ...actual, submitBatch: vi.fn().mockResolvedValue(undefined) };
 });
 
 // 2. Mock Sentences (Load only 2 sentences for speed)
-vi.mock('../lib/sentences', () => ({
+vi.mock('@/lib/sentences', () => ({
   loadSentences: vi.fn().mockResolvedValue([
     { id: 's1', text: 'Sentence One' },
     { id: 's2', text: 'Sentence Two' }
@@ -39,7 +39,7 @@ const MOCK_SENTENCES = [
 const MOCK_MODELS = ['m1', 'm2', 'm3', 'm4'];
 
 // 3. Mock Helpers (Stop timeouts/scrolls)
-vi.mock('../hooks/useLocalStorage', () => ({
+vi.mock('@/hooks/useLocalStorage', () => ({
   useLocalStorage: () => ({ saveToStorage: vi.fn(), loadFromStorage: vi.fn(() => null), clearStorage: vi.fn() }),
   useAutoSave: () => {}, // Critical: Prevents hanging timers
 }));

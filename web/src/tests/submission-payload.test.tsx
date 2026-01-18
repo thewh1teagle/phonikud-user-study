@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { submitBatch } from '../lib/firebase';
+import { submitBatch } from '@/lib/firebase';
 
 // 1. Mock Firebase modules BEFORE any imports to prevent initialization side effects
 vi.mock('firebase/app', () => ({
@@ -20,8 +20,8 @@ vi.mock('firebase/firestore', () => ({
 
 // 2. Mock our own firebase lib to spy on submitBatch
 // We use a variable to capture the spy so we can assert on it
-vi.mock('../lib/firebase', async () => {
-  const actual = await vi.importActual<typeof import('../lib/firebase')>('../lib/firebase');
+vi.mock('@/lib/firebase', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/firebase')>('@/lib/firebase');
   return {
     ...actual,
     submitBatch: vi.fn().mockResolvedValue(undefined),

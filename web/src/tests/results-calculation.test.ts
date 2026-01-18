@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateStats } from '../lib/firebase';
+import { calculateStats } from '@/lib/firebase';
 
 describe('calculateStats', () => {
   it('computes per-model counts and averages', () => {
