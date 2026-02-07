@@ -7,7 +7,7 @@ import { getAllSubmissions, calculateStats, exportToCSV } from '../lib/firebase'
 import { RefreshCcw, Download, Home, MessageSquare, Database } from 'lucide-react';
 
 export default function Results() {
-  const [stats, setStats] = useState<ModelStats[]>([]);
+  const [stats, setStats] = useState<ModelStats | null>(null);
   const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [uniqueParticipants, setUniqueParticipants] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,13 +25,10 @@ export default function Results() {
       const submissions = await getAllSubmissions();
       setTotalSubmissions(submissions.length);
 
-      // Count unique participants
       const uniqueEmails = new Set(submissions.map(s => s.email));
       setUniqueParticipants(uniqueEmails.size);
 
-      // Calculate stats
-      const modelStats = calculateStats(submissions);
-      setStats(modelStats);
+      setStats(calculateStats(submissions));
     } catch (err) {
       console.error('Error loading results:', err);
       setError('שגיאה בטעינת התוצאות');
@@ -99,33 +96,37 @@ export default function Results() {
               </div>
             </div>
 
-            {/* Model Statistics Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-slate-200">
-                    <th className="border p-3 text-right" dir="rtl">מודל</th>
-                    <th className="border p-3 text-center" dir="rtl">ניצחונות טבעיות</th>
-                    <th className="border p-3 text-center" dir="rtl">ניצחונות דיוק</th>
-                    <th className="border p-3 text-center" dir="rtl">סה&quot;כ השוואות</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.map(stat => (
-                    <tr key={stat.model} className="hover:bg-slate-50">
-                      <td className="border p-3 font-semibold">{stat.model}</td>
-                      <td className="border p-3 text-center">
-                        {stat.naturalness_wins} ({stat.total_comparisons > 0 ? Math.round((stat.naturalness_wins / stat.total_comparisons) * 100) : 0}%)
-                      </td>
-                      <td className="border p-3 text-center">
-                        {stat.accuracy_wins} ({stat.total_comparisons > 0 ? Math.round((stat.accuracy_wins / stat.total_comparisons) * 100) : 0}%)
-                      </td>
-                      <td className="border p-3 text-center">{stat.total_comparisons}</td>
+            {/* CMOS Results */}
+            {stats ? (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-slate-200">
+                      <th className="border p-3 text-right" dir="rtl">מדד</th>
+                      <th className="border p-3 text-center" dir="rtl">ממוצע CMOS</th>
+                      <th className="border p-3 text-center" dir="rtl">רווח סמך 95%</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    <tr className="hover:bg-slate-50">
+                      <td className="border p-3 font-semibold" dir="rtl">טבעיות</td>
+                      <td className="border p-3 text-center">{stats.meanNaturalness.toFixed(2)}</td>
+                      <td className="border p-3 text-center">&plusmn;{stats.ciNaturalness.toFixed(2)}</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50">
+                      <td className="border p-3 font-semibold" dir="rtl">התאמה לטקסט</td>
+                      <td className="border p-3 text-center">{stats.meanAccuracy.toFixed(2)}</td>
+                      <td className="border p-3 text-center">&plusmn;{stats.ciAccuracy.toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div className="text-xs text-slate-500 mt-2 text-center" dir="rtl">
+                  ציון חיובי = A עדיף, ציון שלילי = B עדיף, 0 = דומה. סולם: -3 עד +3.
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-slate-500" dir="rtl">אין נתונים עדיין</div>
+            )}
 
             {/* Actions */}
             <div className="flex flex-wrap justify-between items-center gap-2 pt-4">

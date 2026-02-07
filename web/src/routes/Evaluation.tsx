@@ -94,7 +94,7 @@ export default function Evaluation() {
   );
 
   const rating = getRating(currentSentenceId);
-  const allRatingsComplete = Boolean(rating?.naturalness && rating?.accuracy);
+  const allRatingsComplete = rating?.naturalness != null && rating?.accuracy != null;
 
   if (!currentSentenceData || !currentModelShuffle) {
     return (
@@ -107,23 +107,21 @@ export default function Evaluation() {
   const [modelA, modelB] = currentModelShuffle.modelOrder;
 
   const handleNext = async () => {
-    if (!allRatingsComplete || !currentSentenceId || !rating) return;
+    if (!allRatingsComplete || !currentSentenceId || !rating || rating.naturalness == null || rating.accuracy == null) return;
 
     // Check if this sentence hasn't been submitted yet
     if (!surveyState.submittedSentences.includes(currentSentenceId)) {
       setIsSubmitting(true);
 
       try {
-        // Resolve A/B to actual model names
-        const naturalness_preferred = rating.naturalness === 'A' ? modelA : modelB;
-        const accuracy_preferred = rating.accuracy === 'A' ? modelA : modelB;
-
         await submitBatch([{
           name: userData.name,
           email: userData.email,
           sentence_id: currentSentenceId,
-          naturalness_preferred,
-          accuracy_preferred
+          model_a: modelA,
+          model_b: modelB,
+          naturalness_cmos: rating.naturalness,
+          accuracy_cmos: rating.accuracy
         }]);
 
         markSentenceAsSubmitted(currentSentenceId);
@@ -181,7 +179,7 @@ export default function Evaluation() {
               <div className="font-semibold">הנחיות להשוואה</div>
               <div className="grid gap-1">
                 <div>
-                  האזינו לשתי הדגימות ובחרו מי נשמע טוב יותר בכל קטגוריה.
+                  האזינו לשתי הדגימות והשוו ביניהן בכל קטגוריה בסולם של 7 דרגות.
                 </div>
               </div>
             </div>
@@ -265,7 +263,7 @@ export default function Evaluation() {
         {/* Warning if not complete */}
         {!allRatingsComplete && (
           <div className="text-center text-sm text-amber-600" dir="rtl">
-            נא לבחור העדפה בכל קטגוריה לפני המעבר למשפט הבא
+            נא לדרג את שתי הקטגוריות לפני המעבר למשפט הבא
           </div>
         )}
       </div>

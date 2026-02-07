@@ -9,8 +9,8 @@ export interface UserData {
 
 export interface Rating {
   sentenceId: string;
-  naturalness?: 'A' | 'B';
-  accuracy?: 'A' | 'B';
+  naturalness?: number; // CMOS: -3 to +3 (positive = A better)
+  accuracy?: number;    // CMOS: -3 to +3 (positive = A better)
 }
 
 export interface ModelShuffle {

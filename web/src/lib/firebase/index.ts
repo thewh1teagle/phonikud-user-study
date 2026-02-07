@@ -18,8 +18,10 @@ export interface Submission {
   name: string;
   email: string;
   sentence_id: string;
-  naturalness_preferred: string; // actual model name
-  accuracy_preferred: string;    // actual model name
+  model_a: string;
+  model_b: string;
+  naturalness_cmos: number; // -3 to +3 (positive = A better)
+  accuracy_cmos: number;    // -3 to +3 (positive = A better)
   timestamp?: Date;
 }
 
@@ -114,35 +116,37 @@ export async function getAllSubmissions(): Promise<Submission[]> {
 }
 
 /**
- * Calculate win-count statistics per model
+ * Calculate CMOS statistics
  */
 export interface ModelStats {
-  model: string;
-  naturalness_wins: number;
-  accuracy_wins: number;
-  total_comparisons: number;
+  count: number;
+  meanNaturalness: number;
+  meanAccuracy: number;
+  ciNaturalness: number; // 95% confidence interval half-width
+  ciAccuracy: number;
 }
 
-export function calculateStats(submissions: Submission[]): ModelStats[] {
-  const modelMap: Record<string, { naturalness_wins: number; accuracy_wins: number; total: number }> = {};
+export function calculateStats(submissions: Submission[]): ModelStats | null {
+  if (submissions.length === 0) return null;
 
-  for (const sub of submissions) {
-    for (const model of [sub.naturalness_preferred, sub.accuracy_preferred]) {
-      if (!modelMap[model]) {
-        modelMap[model] = { naturalness_wins: 0, accuracy_wins: 0, total: 0 };
-      }
-    }
+  const nat = submissions.map(s => s.naturalness_cmos);
+  const acc = submissions.map(s => s.accuracy_cmos);
+  const n = submissions.length;
 
-    modelMap[sub.naturalness_preferred].naturalness_wins++;
-    modelMap[sub.accuracy_preferred].accuracy_wins++;
-  }
+  const mean = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+  const std = (arr: number[], m: number) =>
+    Math.sqrt(arr.reduce((a, b) => a + (b - m) ** 2, 0) / (arr.length - 1 || 1));
 
-  return Object.keys(modelMap).map(model => ({
-    model,
-    naturalness_wins: modelMap[model].naturalness_wins,
-    accuracy_wins: modelMap[model].accuracy_wins,
-    total_comparisons: submissions.length
-  }));
+  const meanNat = mean(nat);
+  const meanAcc = mean(acc);
+
+  return {
+    count: n,
+    meanNaturalness: meanNat,
+    meanAccuracy: meanAcc,
+    ciNaturalness: 1.96 * std(nat, meanNat) / Math.sqrt(n),
+    ciAccuracy: 1.96 * std(acc, meanAcc) / Math.sqrt(n),
+  };
 }
 
 /**
@@ -153,7 +157,7 @@ export async function exportToCSV(): Promise<string> {
     const querySnapshot = await getDocs(collection(db, 'submissions'));
 
     // CSV header
-    const headers = ['name', 'email', 'sentence_id', 'naturalness_preferred', 'accuracy_preferred', 'timestamp'];
+    const headers = ['name', 'email', 'sentence_id', 'model_a', 'model_b', 'naturalness_cmos', 'accuracy_cmos', 'timestamp'];
     const rows = [headers.join(',')];
 
     // CSV rows
@@ -163,8 +167,10 @@ export async function exportToCSV(): Promise<string> {
         data.name,
         data.email,
         data.sentence_id,
-        data.naturalness_preferred,
-        data.accuracy_preferred,
+        data.model_a,
+        data.model_b,
+        data.naturalness_cmos,
+        data.accuracy_cmos,
         data.timestamp?.toDate?.().toISOString() || data.timestamp
       ];
       rows.push(row.join(','));

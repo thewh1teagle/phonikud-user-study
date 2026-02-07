@@ -32,27 +32,25 @@ describe('Evaluation Core Logic', () => {
     vi.clearAllMocks();
   });
 
-  it('generates correct A/B submission payload', async () => {
+  it('generates correct CMOS submission payload', async () => {
     const sentenceId = 'sentence-1';
     const user = { name: 'Test User', email: 'test@example.com' };
 
-    // Simulate the exact logic used in Evaluation.tsx:handleNext
     const submission = {
       name: user.name,
       email: user.email,
       sentence_id: sentenceId,
-      naturalness_preferred: 'styletts2',
-      accuracy_preferred: 'roboshaul',
+      model_a: 'styletts2',
+      model_b: 'roboshaul',
+      naturalness_cmos: 2,
+      accuracy_cmos: -1,
     };
 
-    // Call the function
     await submitBatch([submission]);
 
-    // Verify the mock was called
     const mockedSubmit = vi.mocked(submitBatch);
     expect(mockedSubmit).toHaveBeenCalledTimes(1);
 
-    // Verify payload structure
     const payload = mockedSubmit.mock.calls[0][0];
     expect(payload).toHaveLength(1);
 
@@ -61,8 +59,10 @@ describe('Evaluation Core Logic', () => {
         name: 'Test User',
         email: 'test@example.com',
         sentence_id: 'sentence-1',
-        naturalness_preferred: 'styletts2',
-        accuracy_preferred: 'roboshaul',
+        model_a: 'styletts2',
+        model_b: 'roboshaul',
+        naturalness_cmos: 2,
+        accuracy_cmos: -1,
       })
     );
   });

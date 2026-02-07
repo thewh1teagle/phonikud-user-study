@@ -51,7 +51,7 @@ describe('Full Survey Flow Integration', () => {
     vi.clearAllMocks();
   });
 
-  it('completes the entire survey flow with A/B preferences', async () => {
+  it('completes the entire survey flow with CMOS ratings', async () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <UserProvider>
@@ -83,13 +83,10 @@ describe('Full Survey Flow Integration', () => {
       // Wait for sentence text to appear
       await screen.findByText(/Sentence (One|Two)/);
 
-      // Find and click A/B toggle buttons for naturalness and accuracy
-      // The RatingInput component renders toggle buttons labeled "A" and "B"
-      const buttons = screen.getAllByRole('button', { name: /^[AB]$/ });
-      // There should be 4 toggle buttons: 2 for naturalness (A, B), 2 for accuracy (A, B)
-      // Click A for naturalness (first pair) and B for accuracy (second pair)
-      fireEvent.click(buttons[0]); // naturalness: A
-      fireEvent.click(buttons[3]); // accuracy: B
+      // Click a CMOS option for naturalness (first "דומה" button) and accuracy (second "דומה" button)
+      const similarButtons = screen.getAllByRole('button', { name: /דומה/ });
+      fireEvent.click(similarButtons[0]); // naturalness: 0
+      fireEvent.click(similarButtons[1]); // accuracy: 0
 
       // Click Next / Finish
       const nextBtn = screen.getByRole('button', { name: /הבא|סיים/i });
@@ -102,11 +99,9 @@ describe('Full Survey Flow Integration', () => {
     }
 
     // 3. Verify Submission
-    // submitBatch is called PER SENTENCE, each with 1 item
     const calls = vi.mocked(submitBatch).mock.calls;
     expect(calls).toHaveLength(MOCK_SENTENCES.length);
 
-    // Each call should have exactly 1 submission
     const allSubmissions = calls.flatMap(call => call[0] as Submission[]);
     expect(allSubmissions).toHaveLength(MOCK_SENTENCES.length);
 
@@ -115,8 +110,10 @@ describe('Full Survey Flow Integration', () => {
       name: 'Random Tester',
       email: 'random@test.com',
       sentence_id: expect.stringMatching(/s[1-2]/),
-      naturalness_preferred: expect.any(String),
-      accuracy_preferred: expect.any(String),
+      model_a: expect.any(String),
+      model_b: expect.any(String),
+      naturalness_cmos: 0,
+      accuracy_cmos: 0,
     });
 
     // 4. Verify Thank You Page

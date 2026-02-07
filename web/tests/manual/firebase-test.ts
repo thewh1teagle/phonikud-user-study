@@ -11,8 +11,10 @@ async function main() {
       name: 'Test User',
       email: 'test@example.com',
       sentence_id: '0',
-      naturalness_preferred: 'styletts2',
-      accuracy_preferred: 'roboshaul'
+      model_a: 'styletts2',
+      model_b: 'roboshaul',
+      naturalness_cmos: 2,
+      accuracy_cmos: -1
     });
     console.log('Submission successful!');
   }
