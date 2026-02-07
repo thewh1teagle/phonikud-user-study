@@ -142,8 +142,8 @@ export function AudioPlayer({
             />
           </div>
           
-          <div className="text-sm text-slate-600 min-w-[80px] text-center">
-            {formatTime(currentTime)} / {formatTime(duration)}
+          <div className="text-xs text-slate-500 tabular-nums whitespace-nowrap">
+            {formatTime(currentTime)}/{formatTime(duration)}
           </div>
         </div>
       </div>

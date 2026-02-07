@@ -196,9 +196,9 @@ export default function Evaluation() {
           </div>
         </div>
 
-        {/* Audio Players Side by Side */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+        {/* Audio Players */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
             <div className="text-lg font-bold text-center">A</div>
             <AudioPlayer
               key={`audio-${currentSentenceId}-A`}
@@ -209,7 +209,7 @@ export default function Evaluation() {
               showLabel={false}
             />
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
             <div className="text-lg font-bold text-center">B</div>
             <AudioPlayer
               key={`audio-${currentSentenceId}-B`}
