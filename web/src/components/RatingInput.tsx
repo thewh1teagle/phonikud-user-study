@@ -1,4 +1,3 @@
-import { Slider } from './ui/slider';
 import { Label } from './ui/label';
 import { cn } from '../lib/utils';
 
@@ -11,60 +10,69 @@ interface RatingInputProps {
 }
 
 const CMOS_OPTIONS = [
-  { value: 3,  label: 'A הרבה יותר טוב' },
-  { value: 2,  label: 'A יותר טוב' },
-  { value: 1,  label: 'A קצת יותר טוב' },
-  { value: 0,  label: 'דומה' },
-  { value: -1, label: 'B קצת יותר טוב' },
-  { value: -2, label: 'B יותר טוב' },
-  { value: -3, label: 'B הרבה יותר טוב' },
+  { value: 3,  label: 'A הרבה יותר טוב', short: 'A++' },
+  { value: 2,  label: 'A יותר טוב',      short: 'A+' },
+  { value: 1,  label: 'A קצת יותר טוב',  short: 'A' },
+  { value: 0,  label: 'דומה',             short: '=' },
+  { value: -1, label: 'B קצת יותר טוב',  short: 'B' },
+  { value: -2, label: 'B יותר טוב',      short: 'B+' },
+  { value: -3, label: 'B הרבה יותר טוב', short: 'B++' },
 ] as const;
 
-function getLabel(value: number): string {
-  return CMOS_OPTIONS.find(o => o.value === value)?.label ?? '';
-}
-
 function CmosScale({
+  name,
   title,
   value,
   onChange
 }: {
+  name: string;
   title: string;
   value?: number;
   onChange: (v: number) => void;
 }) {
-  const hasValue = value !== undefined;
-
   return (
     <div className="space-y-4">
       <Label className="text-base font-semibold block text-center">{title}</Label>
-      <div className="max-w-sm mx-auto space-y-3">
-        {/* Current selection label */}
-        <div className="text-center text-sm font-medium h-5">
-          {hasValue ? getLabel(value) : ''}
-        </div>
 
-        {/* Slider */}
-        <Slider
-          dir="ltr"
-          min={-3}
-          max={3}
-          step={1}
-          value={hasValue ? [value] : [0]}
-          onValueChange={([v]) => onChange(v)}
-          className={cn(!hasValue && "opacity-40")}
-        />
+      {/* End labels */}
+      <div className="flex justify-between items-center px-1">
+        <span className="text-xs text-muted-foreground">A הרבה יותר טוב</span>
+        <span className="text-xs text-muted-foreground">B הרבה יותר טוב</span>
+      </div>
 
-        {/* Tick marks and end labels */}
-        <div className="flex justify-between items-start">
-          <span className="text-xs text-muted-foreground text-center w-16">A יותר טוב</span>
-          <div className="flex-1 flex justify-between px-1">
-            {CMOS_OPTIONS.map((_, i) => (
-              <div key={i} className="w-0.5 h-1.5 bg-slate-300 rounded-full" />
-            ))}
-          </div>
-          <span className="text-xs text-muted-foreground text-center w-16">B יותר טוב</span>
-        </div>
+      {/* Radio row */}
+      <div className="flex justify-between items-start">
+        {CMOS_OPTIONS.map(option => (
+          <label
+            key={option.value}
+            className="flex flex-col items-center gap-1.5 cursor-pointer group flex-1"
+          >
+            <span
+              className={cn(
+                "flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 transition-colors",
+                value === option.value
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-300 text-slate-500 group-hover:border-slate-500"
+              )}
+            >
+              <span className="text-xs sm:text-sm font-medium">{option.short}</span>
+            </span>
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => onChange(option.value)}
+              className="sr-only"
+            />
+            <span className={cn(
+              "text-[10px] sm:text-xs leading-tight text-center max-w-[50px] sm:max-w-[70px]",
+              value === option.value ? "text-slate-900 font-medium" : "text-muted-foreground"
+            )}>
+              {option.label}
+            </span>
+          </label>
+        ))}
       </div>
     </div>
   );
@@ -78,13 +86,15 @@ export function RatingInput({
   className
 }: RatingInputProps) {
   return (
-    <div className={cn("grid grid-cols-1 sm:grid-cols-2 gap-8", className)}>
+    <div className={cn("grid grid-cols-1 gap-10", className)}>
       <CmosScale
+        name="naturalness"
         title="מה נשמע יותר טבעי?"
         value={naturalness}
         onChange={onNaturalnessChange}
       />
       <CmosScale
+        name="accuracy"
         title="מה יותר תואם לטקסט?"
         value={accuracy}
         onChange={onAccuracyChange}
