@@ -17,7 +17,16 @@ import { Info, ChevronLeft, ChevronRight } from 'lucide-react';
 export default function Evaluation() {
   const navigate = useNavigate();
   const { userData } = useUser();
-  const { surveyState, setCurrentSentenceIndex, updateRating, getRating, markSentenceAsSubmitted, completeSurvey } = useSurvey();
+  const {
+    surveyState,
+    setCurrentSentenceIndex,
+    updateRating,
+    getRating,
+    markSentenceAsSubmitted,
+    markAudioAsPlayed,
+    hasPlayedBothAudios,
+    completeSurvey
+  } = useSurvey();
   const { saveToStorage } = useLocalStorage(userData?.sessionId || null);
   const { registerAudio } = useSingleAudioPlayer();
 
@@ -95,6 +104,8 @@ export default function Evaluation() {
 
   const rating = getRating(currentSentenceId);
   const allRatingsComplete = rating?.naturalness != null && rating?.accuracy != null;
+  const bothAudiosPlayed = hasPlayedBothAudios(currentSentenceId);
+  const canProceed = allRatingsComplete && bothAudiosPlayed;
 
   if (!currentSentenceData || !currentModelShuffle) {
     return (
@@ -107,7 +118,7 @@ export default function Evaluation() {
   const [modelA, modelB] = currentModelShuffle.modelOrder;
 
   const handleNext = async () => {
-    if (!allRatingsComplete || !currentSentenceId || !rating || rating.naturalness == null || rating.accuracy == null) return;
+    if (!canProceed || !currentSentenceId || !rating || rating.naturalness == null || rating.accuracy == null) return;
 
     // Check if this sentence hasn't been submitted yet
     if (!surveyState.submittedSentences.includes(currentSentenceId)) {
@@ -156,7 +167,7 @@ export default function Evaluation() {
   const audioSrcB = `${import.meta.env.BASE_URL}audio/${modelB}/${currentSentenceId}.m4a`;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4">
+    <div className="min-h-screen bg-slate-50 py-8 pb-20 px-4">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Progress Bar */}
         <div className="space-y-2">
@@ -204,6 +215,7 @@ export default function Evaluation() {
               key={`audio-${currentSentenceId}-A`}
               audioSrc={audioSrcA}
               label="A"
+              onPlayed={() => markAudioAsPlayed(currentSentenceId, 'A')}
               onAudioRef={registerAudio}
               className="bg-transparent p-0 border-0 rounded-none shadow-none"
               showLabel={false}
@@ -215,6 +227,7 @@ export default function Evaluation() {
               key={`audio-${currentSentenceId}-B`}
               audioSrc={audioSrcB}
               label="B"
+              onPlayed={() => markAudioAsPlayed(currentSentenceId, 'B')}
               onAudioRef={registerAudio}
               className="bg-transparent p-0 border-0 rounded-none shadow-none"
               showLabel={false}
@@ -230,6 +243,11 @@ export default function Evaluation() {
             onNaturalnessChange={(v) => updateRating(currentSentenceId, { naturalness: v })}
             onAccuracyChange={(v) => updateRating(currentSentenceId, { accuracy: v })}
           />
+          {!bothAudiosPlayed && (
+            <div className="mt-3 text-sm text-amber-700 text-center" dir="rtl">
+              כדי להמשיך, יש להפעיל לפחות פעם אחת את שתי הדגימות (A ו-B).
+            </div>
+          )}
         </div>
 
         {/* Navigation Buttons */}
@@ -245,7 +263,7 @@ export default function Evaluation() {
 
           <Button
             onClick={handleNext}
-            disabled={!allRatingsComplete || isSubmitting}
+            disabled={!canProceed || isSubmitting}
           >
             {isSubmitting ? (
               'שומר...'

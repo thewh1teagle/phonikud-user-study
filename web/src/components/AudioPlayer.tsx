@@ -89,6 +89,10 @@ export function AudioPlayer({
     if (isPlaying) {
       audio.pause();
     } else {
+      if (!hasPlayed && onPlayed) {
+        setHasPlayed(true);
+        onPlayed();
+      }
       audio.play();
     }
     setIsPlaying(!isPlaying);

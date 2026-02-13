@@ -9,6 +9,8 @@ interface SurveyContextType {
   updateRating: (sentenceId: string, updates: Partial<Rating>) => void;
   setModelShuffles: (shuffles: ModelShuffle[]) => void;
   markSentenceAsSubmitted: (sentenceId: string) => void;
+  markAudioAsPlayed: (sentenceId: string, label: 'A' | 'B') => void;
+  hasPlayedBothAudios: (sentenceId: string) => boolean;
   completeSurvey: () => void;
   resetSurvey: () => void;
   getRating: (sentenceId: string) => Rating | undefined;
@@ -21,7 +23,8 @@ const initialState: SurveyState = {
   ratings: [],
   modelShuffles: [],
   isComplete: false,
-  submittedSentences: []
+  submittedSentences: [],
+  audioPlayStatus: {}
 };
 
 export function SurveyProvider({ children }: { children: ReactNode }) {
@@ -68,6 +71,29 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const markAudioAsPlayed = (sentenceId: string, label: 'A' | 'B') => {
+    setSurveyState(prev => {
+      const existing = prev.audioPlayStatus[sentenceId] || { A: false, B: false };
+      if (existing[label]) return prev;
+
+      return {
+        ...prev,
+        audioPlayStatus: {
+          ...prev.audioPlayStatus,
+          [sentenceId]: {
+            ...existing,
+            [label]: true
+          }
+        }
+      };
+    });
+  };
+
+  const hasPlayedBothAudios = (sentenceId: string): boolean => {
+    const status = surveyState.audioPlayStatus[sentenceId];
+    return Boolean(status?.A && status?.B);
+  };
+
   const completeSurvey = () => {
     setSurveyState(prev => ({ ...prev, isComplete: true }));
   };
@@ -91,6 +117,8 @@ export function SurveyProvider({ children }: { children: ReactNode }) {
         updateRating,
         setModelShuffles,
         markSentenceAsSubmitted,
+        markAudioAsPlayed,
+        hasPlayedBothAudios,
         completeSurvey,
         resetSurvey,
         getRating

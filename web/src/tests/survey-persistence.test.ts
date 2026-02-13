@@ -39,6 +39,7 @@ describe('Persistence Logic (Data Recovery)', () => {
       modelShuffles: [],
       isComplete: false,
       submittedSentences: [],
+      audioPlayStatus: {},
     },
     lastUpdated: '2024-01-01T00:00:00.000Z'
   };

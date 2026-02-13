@@ -83,10 +83,15 @@ describe('Full Survey Flow Integration', () => {
       // Wait for sentence text to appear
       await screen.findByText(/Sentence (One|Two)/);
 
-      // Click a CMOS option for naturalness (first "דומה" button) and accuracy (second "דומה" button)
-      const similarButtons = screen.getAllByRole('button', { name: /דומה/ });
-      fireEvent.click(similarButtons[0]); // naturalness: 0
-      fireEvent.click(similarButtons[1]); // accuracy: 0
+      // Play both audio samples (A and B)
+      const playButtons = screen.getAllByRole('button', { name: /הפעל/ });
+      fireEvent.click(playButtons[0]);
+      fireEvent.click(playButtons[1]);
+
+      // Click a CMOS option for naturalness (first "דומה") and accuracy (second "דומה")
+      const similarOptions = screen.getAllByRole('radio', { name: /דומה/ });
+      fireEvent.click(similarOptions[0]); // naturalness: 0
+      fireEvent.click(similarOptions[1]); // accuracy: 0
 
       // Click Next / Finish
       const nextBtn = screen.getByRole('button', { name: /הבא|סיים/i });

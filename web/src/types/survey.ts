@@ -24,6 +24,7 @@ export interface SurveyState {
   modelShuffles: ModelShuffle[]; // Per-sentence model orders
   isComplete: boolean;
   submittedSentences: string[]; // IDs of sentences already submitted to Firebase
+  audioPlayStatus: Record<string, { A: boolean; B: boolean }>; // Per-sentence playback state
 }
 
 export interface Sentence {

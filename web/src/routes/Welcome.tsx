@@ -88,7 +88,8 @@ export default function Welcome() {
             ratings: [],
             modelShuffles,
             isComplete: false,
-            submittedSentences: []
+            submittedSentences: [],
+            audioPlayStatus: {}
           },
           lastUpdated: new Date().toISOString()
         }));
