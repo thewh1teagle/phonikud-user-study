@@ -1,4 +1,4 @@
-import { Button } from './ui/button';
+import { Slider } from './ui/slider';
 import { Label } from './ui/label';
 import { cn } from '../lib/utils';
 
@@ -20,6 +20,10 @@ const CMOS_OPTIONS = [
   { value: -3, label: 'B הרבה יותר טוב' },
 ] as const;
 
+function getLabel(value: number): string {
+  return CMOS_OPTIONS.find(o => o.value === value)?.label ?? '';
+}
+
 function CmosScale({
   title,
   value,
@@ -29,26 +33,38 @@ function CmosScale({
   value?: number;
   onChange: (v: number) => void;
 }) {
+  const hasValue = value !== undefined;
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <Label className="text-base font-semibold block text-center">{title}</Label>
-      <div className="flex flex-col gap-1.5 max-w-sm mx-auto">
-        {CMOS_OPTIONS.map(option => (
-          <Button
-            key={option.value}
-            type="button"
-            variant={value === option.value ? 'default' : 'outline'}
-            size="sm"
-            className={cn(
-              "w-full justify-center text-sm h-9",
-              value === option.value && "ring-2 ring-offset-1 ring-slate-900",
-              option.value === 0 && value !== 0 && "border-dashed"
-            )}
-            onClick={() => onChange(option.value)}
-          >
-            {option.label}
-          </Button>
-        ))}
+      <div className="max-w-sm mx-auto space-y-3">
+        {/* Current selection label */}
+        <div className="text-center text-sm font-medium h-5">
+          {hasValue ? getLabel(value) : ''}
+        </div>
+
+        {/* Slider */}
+        <Slider
+          dir="ltr"
+          min={-3}
+          max={3}
+          step={1}
+          value={hasValue ? [value] : [0]}
+          onValueChange={([v]) => onChange(v)}
+          className={cn(!hasValue && "opacity-40")}
+        />
+
+        {/* Tick marks and end labels */}
+        <div className="flex justify-between items-start">
+          <span className="text-xs text-muted-foreground text-center w-16">A יותר טוב</span>
+          <div className="flex-1 flex justify-between px-1">
+            {CMOS_OPTIONS.map((_, i) => (
+              <div key={i} className="w-0.5 h-1.5 bg-slate-300 rounded-full" />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground text-center w-16">B יותר טוב</span>
+        </div>
       </div>
     </div>
   );
