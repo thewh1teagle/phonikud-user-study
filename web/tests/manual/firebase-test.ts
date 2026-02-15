@@ -1,4 +1,4 @@
-import { submitSubmission, exportToCSV } from '../../src/lib/firebase';
+import { submitSubmission } from '../../src/lib/firebase';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -18,18 +18,9 @@ async function main() {
     });
     console.log('Submission successful!');
   }
-  else if (command === 'export') {
-    // Test export
-    console.log('Exporting to CSV...');
-    const csv = await exportToCSV();
-    console.log('\n--- CSV Output ---\n');
-    console.log(csv);
-    console.log('\n--- End CSV ---\n');
-  }
   else {
     console.log('Usage:');
     console.log('  pnpx tsx tests/manual/firebase-test.ts submit   - Test submitting a rating');
-    console.log('  pnpx tsx tests/manual/firebase-test.ts export   - Export all submissions to CSV');
   }
 }
 

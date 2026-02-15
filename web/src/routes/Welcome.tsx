@@ -148,7 +148,7 @@ export default function Welcome() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" dir="rtl">שם מלא</Label>
+              <Label htmlFor="name" dir="rtl">שם</Label>
               <Input
                 id="name"
                 type="text"

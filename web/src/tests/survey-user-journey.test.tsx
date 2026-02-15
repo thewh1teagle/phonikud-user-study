@@ -72,7 +72,7 @@ describe('Full Survey Flow Integration', () => {
     await screen.findByText(/ברוכים הבאים/i);
 
     // Fill User Info
-    fireEvent.change(screen.getByLabelText(/שם מלא/i), { target: { value: 'Random Tester' } });
+    fireEvent.change(screen.getByLabelText(/שם/i), { target: { value: 'Random Tester' } });
     fireEvent.change(screen.getByLabelText(/אימייל/i), { target: { value: 'random@test.com' } });
     const yesRadio = screen.getByLabelText('כן');
     fireEvent.click(yesRadio);

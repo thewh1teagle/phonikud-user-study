@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, writeBatch, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, writeBatch, doc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDhX8O6T5v1wNVFQsQQ4j9_K9jQTNarf2s",
@@ -85,100 +85,6 @@ export async function submitComments(commentData: CommentSubmission): Promise<vo
     console.log('Comments submitted with ID:', docRef.id);
   } catch (error) {
     console.error('Error submitting comments:', error);
-    throw error;
-  }
-}
-
-/**
- * Get all comments from Firestore
- */
-export async function getAllComments(): Promise<CommentSubmission[]> {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'comments'));
-    return querySnapshot.docs.map(doc => doc.data() as CommentSubmission);
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-    throw error;
-  }
-}
-
-/**
- * Get all submissions from Firestore
- */
-export async function getAllSubmissions(): Promise<Submission[]> {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'submissions'));
-    return querySnapshot.docs.map(doc => doc.data() as Submission);
-  } catch (error) {
-    console.error('Error fetching submissions:', error);
-    throw error;
-  }
-}
-
-/**
- * Calculate CMOS statistics
- */
-export interface ModelStats {
-  count: number;
-  meanNaturalness: number;
-  meanAccuracy: number;
-  ciNaturalness: number; // 95% confidence interval half-width
-  ciAccuracy: number;
-}
-
-export function calculateStats(submissions: Submission[]): ModelStats | null {
-  if (submissions.length === 0) return null;
-
-  const nat = submissions.map(s => s.naturalness_cmos);
-  const acc = submissions.map(s => s.accuracy_cmos);
-  const n = submissions.length;
-
-  const mean = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
-  const std = (arr: number[], m: number) =>
-    Math.sqrt(arr.reduce((a, b) => a + (b - m) ** 2, 0) / (arr.length - 1 || 1));
-
-  const meanNat = mean(nat);
-  const meanAcc = mean(acc);
-
-  return {
-    count: n,
-    meanNaturalness: meanNat,
-    meanAccuracy: meanAcc,
-    ciNaturalness: 1.96 * std(nat, meanNat) / Math.sqrt(n),
-    ciAccuracy: 1.96 * std(acc, meanAcc) / Math.sqrt(n),
-  };
-}
-
-/**
- * Export all submissions as CSV string
- */
-export async function exportToCSV(): Promise<string> {
-  try {
-    const querySnapshot = await getDocs(collection(db, 'submissions'));
-
-    // CSV header
-    const headers = ['name', 'email', 'sentence_id', 'model_a', 'model_b', 'naturalness_cmos', 'accuracy_cmos', 'timestamp'];
-    const rows = [headers.join(',')];
-
-    // CSV rows
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const row = [
-        data.name,
-        data.email,
-        data.sentence_id,
-        data.model_a,
-        data.model_b,
-        data.naturalness_cmos,
-        data.accuracy_cmos,
-        data.timestamp?.toDate?.().toISOString() || data.timestamp
-      ];
-      rows.push(row.join(','));
-    });
-
-    return rows.join('\n');
-  } catch (error) {
-    console.error('Error exporting to CSV:', error);
     throw error;
   }
 }
