@@ -33,3 +33,4 @@ service cloud.firestore {
 2. Save as `service-account.json` in the repo root
 3. Run: `uv run scripts/analyze.py`
 4. Optional comments export: `uv run scripts/export_comments.py`
+5. smoke test (submit + public-read denial): `pnpm --dir web exec tsx tests/manual/firebase-test.ts`
