@@ -105,18 +105,30 @@ def print_report(df: pd.DataFrame, expected: int) -> None:
     n_participants = df["email"].nunique()
     stats = compute_stats(df)
 
-    print(f"=== CMOS Analysis (styletts2 vs roboshaul) ===")
+    print(f"=== CMOS Analysis ===")
+    print(f"Scale: positive = styletts2 better, negative = roboshaul better")
     print(f"Expected sentences per participant: {expected}")
     print(f"Complete participants: {n_participants}")
     print(f"Total ratings: {stats['n_ratings']}")
     print()
-    print(f"Naturalness:  {stats['naturalness_mean']:+.3f}  (95% CI ±{stats['naturalness_ci95']:.3f})")
-    print(f"Accuracy:     {stats['accuracy_mean']:+.3f}  (95% CI ±{stats['accuracy_ci95']:.3f})")
+
+    def winner(val: float) -> str:
+        if val > 0.1:
+            return "→ styletts2 is better"
+        elif val < -0.1:
+            return "→ roboshaul is better"
+        return "→ models are similar"
+
+    nat, acc = stats["naturalness_mean"], stats["accuracy_mean"]
+    print(f"Naturalness:  {nat:+.3f}  (95% CI ±{stats['naturalness_ci95']:.3f})  {winner(nat)}")
+    print(f"Accuracy:     {acc:+.3f}  (95% CI ±{stats['accuracy_ci95']:.3f})  {winner(acc)}")
     print()
 
     # Per-sentence breakdown
+    rename = {"naturalness": "nat (sty−robo)", "accuracy": "acc (sty−robo)"}
     per_sentence = (
-        df.groupby("sentence_id")[["naturalness", "accuracy"]]
+        df.rename(columns=rename)
+        .groupby("sentence_id")[[*rename.values()]]
         .agg(["mean", "count"])
     )
     print("Per-sentence breakdown:")
