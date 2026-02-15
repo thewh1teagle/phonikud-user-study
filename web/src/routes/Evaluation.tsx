@@ -180,19 +180,14 @@ export default function Evaluation() {
           <Progress value={progressPercentage} className="w-full" />
         </div>
 
-        {/* Instructions */}
+        {/* Quick Instructions Reminder */}
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm" dir="rtl">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 rounded-full bg-slate-100 p-2 text-slate-700">
               <Info className="h-4 w-4" />
             </div>
-            <div className="space-y-2 text-sm text-slate-700">
-              <div className="font-semibold">הנחיות להשוואה</div>
-              <div className="grid gap-1">
-                <div>
-                  האזינו לשתי הדגימות והשוו ביניהן בכל קטגוריה בסולם של 7 דרגות.
-                </div>
-              </div>
+            <div className="text-sm text-slate-700">
+              <span className="font-semibold">הוראות:</span> השוו את ההקלטות לפי טבעיות ותאימות לטקסט בסולם 7 דרגות
             </div>
           </div>
         </div>

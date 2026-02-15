@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Pages
 import Welcome from './routes/Welcome';
+import Instructions from './routes/Instructions';
 import Evaluation from './routes/Evaluation';
 import ThankYou from './routes/ThankYou';
 import Results from './routes/Results';
@@ -23,6 +24,14 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter basename='/phonikud-user-study/'>
         <Routes>
           <Route path="/" element={<Welcome />} />
+          <Route 
+            path="/instructions" 
+            element={
+              <ProtectedRoute>
+                <Instructions />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/evaluation" 
             element={

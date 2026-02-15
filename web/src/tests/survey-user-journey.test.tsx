@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Welcome from '@/routes/Welcome';
+import Instructions from '@/routes/Instructions';
 import Evaluation from '@/routes/Evaluation';
 import ThankYou from '@/routes/ThankYou';
 import { UserProvider } from '@/contexts/UserContext';
@@ -58,6 +59,7 @@ describe('Full Survey Flow Integration', () => {
           <SurveyProvider>
             <Routes>
               <Route path="/" element={<Welcome />} />
+              <Route path="/instructions" element={<Instructions />} />
               <Route path="/evaluation" element={<Evaluation />} />
               <Route path="/thank-you" element={<ThankYou />} />
             </Routes>
@@ -78,7 +80,19 @@ describe('Full Survey Flow Integration', () => {
     // Click Start
     fireEvent.click(screen.getByRole('button', { name: /התחל/i }));
 
-    // 2. Evaluation Loop
+    // 2. Instructions Screen
+    await screen.findByText(/הוראות למחקר/i);
+    
+    // Check the "I have read" checkbox
+    const checkbox = screen.getByRole('checkbox');
+    fireEvent.click(checkbox);
+    
+    // Click Continue to Evaluation
+    const continueBtn = screen.getByRole('button', { name: /המשך להערכה/i });
+    await waitFor(() => expect(continueBtn).toBeEnabled());
+    fireEvent.click(continueBtn);
+
+    // 3. Evaluation Loop
     for (let i = 0; i < MOCK_SENTENCES.length; i++) {
       // Wait for sentence text to appear
       await screen.findByText(/Sentence (One|Two)/);
@@ -103,7 +117,7 @@ describe('Full Survey Flow Integration', () => {
       }
     }
 
-    // 3. Verify Submission
+    // 4. Verify Submission
     const calls = vi.mocked(submitBatch).mock.calls;
     expect(calls).toHaveLength(MOCK_SENTENCES.length);
 
@@ -121,7 +135,7 @@ describe('Full Survey Flow Integration', () => {
       accuracy_cmos: 0,
     });
 
-    // 4. Verify Thank You Page
+    // 5. Verify Thank You Page
     await screen.findByText(/תודה רבה על השתתפותך/i);
   });
 });

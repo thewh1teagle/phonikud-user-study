@@ -97,8 +97,8 @@ export default function Welcome() {
         console.error('Error saving to localStorage:', storageError);
       }
       
-      // Navigate to evaluation
-      navigate('/evaluation');
+      // Navigate to instructions
+      navigate('/instructions');
     } catch (error) {
       console.error('Error starting survey:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
